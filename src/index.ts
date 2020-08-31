@@ -1,8 +1,6 @@
 
 import Server from './server/server';
-//import router from './router/router';
 import indexRoutes from './server/routers/index';
-
 import { config } from './server/config/config';
 import bodyParser from "body-parser";
 import * as dotenv from 'dotenv';
@@ -22,14 +20,7 @@ server.app.use(bodyParser.json());
 
 
 //connect database
-// mongoose.connect(config.URI,{
-//     useCreateIndex: true,
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-//     useFindAndModify: false
-// })
-//   .then(db => console.log('db online'))
-//   .catch(err => console.log(err));
+
 
 config.dbConeccion();
 
