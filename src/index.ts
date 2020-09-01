@@ -5,8 +5,7 @@ import { config } from './server/config/config';
 import bodyParser from "body-parser";
 import * as dotenv from 'dotenv';
 import env from './server/config/env';
-
-
+import cors  from "cors";
 
 //Set port 
 const server = Server.init(env.PORT);
@@ -17,11 +16,11 @@ dotenv.config();
 server.app.use(bodyParser.urlencoded({ extended: false }));
 //parse application/json
 server.app.use(bodyParser.json());
+//midelwars
+// server.app.use(cors);
 
 
 //connect database
-
-
 config.dbConeccion();
 
 //all routeres
@@ -29,7 +28,7 @@ config.dbConeccion();
 server.app.use('/api', indexRoutes);
   
 
-
+//Start server
 server.start(() => {
   console.log(`servidor corriendo en el puerto ${env.PORT}`);
 }); 

@@ -25,12 +25,12 @@ const UserSchema = new Schema({
   },
   email: {
     type: String,
-    required: [true, 'El email es necesario'],
-    unique:true
+    unique:true,
+    required: [true, 'El email es necesario']
   },
   password: {
     type: String,
-    required:[true, 'La contraseña es necesaria']
+    required:[true, 'La contrasena es necesaria']
   },
   img: {
     type: String,

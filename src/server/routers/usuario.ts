@@ -1,8 +1,9 @@
-import { Router } from 'express';
+import { Response, Router } from 'express';
 import { userController } from '../controllers/userController';
 import { auth } from '../middlewares/auth';
-
-
+//import  {validations} from '../middlewares/validations'
+const { userValidationRules } = require('../middlewares/validations')
+import { check } from "express-validator";
 class UserRouter{
 
   public router: Router = Router();
@@ -15,10 +16,17 @@ class UserRouter{
   config(): void{
     this.router.get('/:id',auth.verifyToken,auth.verifyRole, userController.getUser);
     this.router.get('',auth.verifyToken,auth.verifyRole, userController.getAllUsers);
-    this.router.post('',auth.verifyToken,auth.verifyRole, userController.addUser);
+
+    this.router.post('',
+      userValidationRules,
+      auth.verifyToken,auth.verifyRole, userController.addUser
+    );
+
     this.router.put('/:id',auth.verifyToken,auth.verifyRole, userController.updateUser);
     this.router.delete('/:id',auth.verifyToken,auth.verifyRole, userController.deleteUser);
   }
+
+  
 }
 const userRoutes = new UserRouter();
 export default userRoutes.router;

@@ -1,5 +1,5 @@
 import {Request, Response} from 'express';
-import providerModel from '../models/providerModel';
+import providerModel from '../models/productModel';
 import _ from 'underscore';
 
 class ProviderController {

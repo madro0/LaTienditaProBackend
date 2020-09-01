@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import env from '../config/env';
 class Config{
   
-
   //=======================================
   //conecion base de datos
   //=======================================
@@ -20,6 +19,7 @@ class Config{
       throw new Error ('error a la hora de iniciar db');
     }
   }
+  
 }
 
 export const config = new Config();

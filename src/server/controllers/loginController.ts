@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import userModel from '../models/userModel';
 import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
-import {config} from '../config/config';
+import env from '../config/env';
 
 
 class LoginController {
@@ -39,8 +39,8 @@ class LoginController {
 
       let token = jwt.sign({
         user: userDB
-      }, config.SEED, {
-        expiresIn: config.CADUCIDAD_TOKEN
+      }, env.SEED, {
+        expiresIn: env.CADUCIDAD_TOKEN
       });
 
       res.json({
