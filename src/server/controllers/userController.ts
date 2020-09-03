@@ -73,48 +73,18 @@ class UserController {
   }
 
   public async addUser(req: Request, res: Response) {
-    // check(req.body.email, 'err err pipipi').isEmail()
-    
-    
-    let erros = validationResult(req);
-    //console.log(erros.mapped());
-
-    if(!erros.isEmpty()){
-        return res.status(400). json({
-            ok: false,
-            err: erros.mapped()
-        });
-    }
     
     let body = req.body;
-    if (!body.password) {
-      return res.status(500).json({
-        ok: false,
-        err: {
-          errors: {
-            password:{
-              properties: {
-                message: "El capo password es necesario",
-                path: "password",
-                value: body.password,
-              }
-            }
-          }
-        }
-      });
-    } else {
-      body.password = hashSync(body.password, 10);
-    }
-
+    
     let usua = new userModel({
       name: body.name,
       email: body.email,
-      password: body.password,
+      password:  body.password = hashSync(body.password, 10),
       role: body.role,
     });
 
     try {
-       let userDb= await usua.save();
+       let userDb = await usua.save();
 
        res.json({
         ok: true,
@@ -149,6 +119,7 @@ class UserController {
         ok: true,
         user,
       });
+      
     } catch (err) {
       return res.status(400).json({
         ok: false,

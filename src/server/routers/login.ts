@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { loginController} from '../controllers/loginController';
-
+const { LoginValidation }  = require ('../middlewares/validations');
 
 
 
@@ -12,7 +12,7 @@ class Login {
   }
   private config(): void{
 
-    this.router.post('', loginController.login);
+    this.router.post('',LoginValidation(), loginController.login);
   
   }
 

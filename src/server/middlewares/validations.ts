@@ -1,43 +1,60 @@
-const { body }  = require('express-validator')
+import { response, NextFunction } from 'express';
 
-const userValidationRules = () => {
-  return [
+import {body, validationResult } from 'express-validator';
+
+const userAddValidation = () => {
+  
+   return  [
     // username must be an email
     body('email').isEmail(),
+    body('name').not().isEmpty(),
+    body('password').not().isEmpty(),
     // password must be at least 5 chars long
-    //body('password').isLength({ min: 5 }),
+    body('password').isLength({ min: 6 }),
+
+
+    getErros
+    
   ]
 }
 
+const userUpdateValidation = () => {
+  
+  return  [
+   // username must be an email
+   body('email').isEmail(),
+   body('name').not().isEmpty(),
+   
+   getErros
+   
+ ]
+} 
+const LoginValidation = () => {
+  
+  return  [
+   // username must be an email
+   body('email').not().isEmpty(),
+   body('password').not().isEmpty(),
+   getErros
+ ]
+} 
+
+const getErros = (req= response, res = response, next:NextFunction ) => {
+
+  const errores = validationResult( req );
+
+  if ( !errores.isEmpty() ) {
+      return res.status(400).json({
+          ok: false,
+          errors: errores.mapped()
+      });
+  }
+  next();
+}
 
 
 module.exports = {
-  userValidationRules
+  userAddValidation,
+  userUpdateValidation,
+  LoginValidation
 }
-
-/*
-exports.login = [
-  check('email').isEmail().withMessage('blabla'),
-  check('password').exists(),
-  (req, res, next) => {
-    try {
-      validationResult(req).throw();
-      next();
-    } catch (err) {
-      res.json(422).json({ errors: err.mapped() });
-    }
-  }
-];
-*/
-
-// class Validations{
-
-//     public validationAddUser (){
-//         return [
-//             check('name','el nombre es obligatorio').not().isEmpty(),
-//             check('email', 'El email es obligatorio').not().isEmpty(),
-//             check('a', 'a es obligatorio').not().isEmpty(),
-//         ];
-//     } 
-// }
-  //export const validations = new validation(); 
