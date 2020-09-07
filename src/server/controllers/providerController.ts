@@ -1,25 +1,17 @@
 import {Request, Response} from 'express';
-import providerModel from '../models/productModel';
+import providerModel from '../models/providerModel';
 import _ from 'underscore';
 
 class ProviderController {
 
 
-  public getProvider(req: Request, res: Response) {
+  public async getProvider(req: Request, res: Response) {
     let id = req.params.id;
 
-
-    providerModel.find()
+    try {
+      let providerDB = await providerModel.find()
       .where('_id').equals(id)
-      .where('active').equals(true)
-      .exec((err, providerDB) => {
-        
-      if (err) {
-        return res.status(500).json({
-          ok: false,
-          err
-        });
-      }
+      .where('active').equals(true);
 
       if ( Object.keys(providerDB).length === 0) {
         return res.status(400).json({
@@ -29,43 +21,48 @@ class ProviderController {
           }
         })
       }
-    
       res.json({
         ok: true,
         provider: providerDB
       })
 
-    });
-  }
+    } catch (err) {
 
-  public getAllProviders(req: Request, res: Response) {
-
-    
-    providerModel.find({ active: true }, 'name nit cel phone web address')
-      .exec((err, providers) => {
-        if (err) {
-          return res.status(400).json({
-            ok: false,
-            err
-          });
-        }
-
-        providerModel.countDocuments({ state: true })
-          .exec((err, count) => {
-          res.json({
-            ok: true,
-            providers,
-            totalProviders: count
-          });
-        });
-
+      return res.status(500).json({
+        ok: false,
+        err
       });
+    }
+    
   }
 
-  public addProvider(req: Request, res: Response) {
+  public async getAllProviders(req: Request, res: Response) {
+
+    try {
+      let providersDB = await providerModel.find({ active: true }, 'name nit cel phone web address');
+
+      providerModel.countDocuments({ state: true })
+        .exec((err, count) => {
+        res.json({
+          ok: true,
+          providersDB,
+          totalProviders: count
+        });
+      });
+
+    } catch (err) {
+      return res.status(400).json({
+        ok: false,
+        err
+      });
+    }
+    
+  }
+
+  public async addProvider(req: Request, res: Response) {
     
     let body = req.body;
-    
+
     let provider = new providerModel({
       name: body.name,
       nit: body.nit,
@@ -74,20 +71,24 @@ class ProviderController {
       web: body.web,
       address: body.address
     });
-    
-    provider.save((err, providerDB) => {
-      if (err) {
-        return res.status(400).json({
-          ok: false,
-          err
-        });
-      }
+
+    try {
+
+      let providerDB = await provider.save();
 
       res.json({
         ok: true,
         provider: providerDB
       });
-    })
+      
+    } catch (err) {
+
+      return res.status(400).json({
+        ok: false,
+        err
+      });
+    }
+    
 
   }
 

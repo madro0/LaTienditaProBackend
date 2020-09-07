@@ -2,6 +2,10 @@ import { response, NextFunction } from 'express';
 
 import {body, validationResult } from 'express-validator';
 
+//=================================================
+//user body validations
+//=================================================
+
 const userAddValidation = () => {
   
    return  [
@@ -11,7 +15,6 @@ const userAddValidation = () => {
     body('password').not().isEmpty(),
     // password must be at least 5 chars long
     body('password').isLength({ min: 6 }),
-
 
     getErros
     
@@ -29,6 +32,9 @@ const userUpdateValidation = () => {
    
  ]
 } 
+//=================================================
+//Login body validations
+//=================================================
 const LoginValidation = () => {
   
   return  [
@@ -38,6 +44,38 @@ const LoginValidation = () => {
    getErros
  ]
 } 
+//=================================================
+//Category body validations
+//=================================================
+const categoryAddValidation = () => {
+  
+  return  [
+    body('user').isMongoId(),
+    getErros
+  ]
+}
+const categoryUpdateValidation = () => {
+  
+  return  [
+    body('user').isMongoId(),
+    getErros
+  ]
+}
+//=================================================
+//providers body validations
+//=================================================
+  const providerAddValidation = () => {
+    
+    return  [
+      body('user').isMongoId(),
+      getErros
+    ]
+  }
+
+
+//=================================================
+//Get erros body 
+//=================================================
 
 const getErros = (req= response, res = response, next:NextFunction ) => {
 
@@ -56,5 +94,7 @@ const getErros = (req= response, res = response, next:NextFunction ) => {
 module.exports = {
   userAddValidation,
   userUpdateValidation,
-  LoginValidation
+  LoginValidation,
+  categoryAddValidation,
+  categoryUpdateValidation
 }

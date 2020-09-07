@@ -50,7 +50,7 @@ class UserController {
 
     try {
       let users = await userModel
-        .find({ state: true }, "name email role google")
+        .find({ state: true }, "name email role img google")
         .skip(from)
         .limit(limit)
         .exec();

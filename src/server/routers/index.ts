@@ -4,6 +4,8 @@ import loginRoutes from './login';
 import categoryRoutes  from './category';
 import providerRoutes  from './provider';
 import productRoutes  from './product';
+import searchRoutes from './search';
+import uploadRoutes from "./upload";
 
 
 
@@ -35,6 +37,14 @@ router.use('/provider', providerRoutes);
 //router product
 //=================================
 router.use('/product', productRoutes);
+//=================================
+//router search
+//=================================
+router.use('/search', searchRoutes);
+//=================================
+//Upload router
+//=================================
+router.use('/upload', uploadRoutes);
 
 
 export default router;

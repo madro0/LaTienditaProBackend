@@ -2,13 +2,13 @@ import mongoose, { Schema, model } from 'mongoose';
 import uniquevalidator from 'mongoose-unique-validator';
 
 export interface Provider extends mongoose.Document {
-  name: String,
-  nit: String,
-  cel: String,
-  phone: String,
-  web: String,
+  name: string,
+  nit: string,
+  cel: string,
+  phone: string,
+  web: string,
   address: string,
-  active:Boolean
+  active:boolean
 }
 
 const ProviderSchema = new Schema({

@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import {categoryController} from '../controllers/categoryController'
 import { auth } from '../middlewares/auth';
+const  validations = require('../middlewares/validations')
+
 
 
 
@@ -14,8 +16,8 @@ class Login {
 
     this.router.get('',auth.verifyToken, categoryController.getAllCategories);
     this.router.get('/:id',auth.verifyToken, categoryController.getCategory);
-    this.router.post('',auth.verifyToken, categoryController.addCategory);
-    this.router.put('/:id',auth.verifyToken, categoryController.updateCategory);
+    this.router.post('',validations.categoryAddValidation(), auth.verifyToken, categoryController.addCategory);
+    this.router.put('/:id',validations.categoryUpdateValidation(),auth.verifyToken, categoryController.updateCategory);
     this.router.delete('/:id',auth.verifyToken, categoryController.deleteCategory);
   
   }

@@ -7,18 +7,12 @@ import { Category } from '../models/categoryModel';
 
 class CategoryController {
 
-  public getCategory(req: Request, res: Response) {
+  public async getCategory (req: Request, res: Response) {
     
     let id = req.params.id;
     
-    categoryModel.findOne({ '_id': id, state: true }, (err, categoryDB:any) => {
-      
-      if (err) {
-        return res.status(500).json({
-          ok: false,
-          err
-        });
-      }
+    try {
+      let categoryDB = await categoryModel.findOne({ '_id': id, state: true });
 
       if (!categoryDB) {
         return res.status(400).json({
@@ -32,21 +26,23 @@ class CategoryController {
       res.json({
         ok: true,
         category: categoryDB
-      })
-    });
-  }
-
-  public getAllCategories(req: Request, res: Response) {
-    
-    categoryModel.find({ state: true }, (err, categoriesDB) => {
+      });
       
-      if (err) {
-        return res.status(400).json({
+    } catch (err) {
+      return res.status(500).json({
           ok: false,
           err
         });
-      }
+    }
+    
+  }
 
+  public async getAllCategories(req: Request, res: Response) {
+    
+
+    try {
+      let categoriesDB = await categoryModel.find({ state: true });
+      
       categoryModel.countDocuments({ state: true }, (err, count) => {
         
         res.json({
@@ -55,10 +51,18 @@ class CategoryController {
           totalCategories: count
         });
       });
-    });
+
+    } catch (err) {
+      return res.status(400).json({
+          ok: false,
+          err
+      });
+    }
+    
+    
   }
 
-  public addCategory(req: Request, res: Response) {
+  public async addCategory(req: Request, res: Response) {
     let body = req.body;
 
     let category = new categoryModel({
@@ -66,67 +70,63 @@ class CategoryController {
       description: body.description,
       user: body.user,
     });
-    
-    category.save((err, categoryDB) => {
-      if (err) {
-        return res.status(400).json({
-          ok: false,
-          err
-        });
-      }
+
+    try {
+      let categoryDB = await category.save();
 
       res.json({
         ok: true,
         message: `New category ${categoryDB.name} successfully created`,
         category: categoryDB
       });
-    });
+
+    } catch (err) {
+      return res.status(400).json({
+          ok: false,
+          err
+        });
+    }
+    
   }
 
-  public updateCategory(req: Request, res: Response) {
+  public async updateCategory(req: Request, res: Response) {
 
     const id: string = req.params.id;
 
     let body = _.pick(req.body, ['name', 'description']);
 
-    categoryModel.findByIdAndUpdate(id, body, { new: true, runValidators: true,  context : 'query'  }, (err, categoryDB:any) => {
-      if (err) {
-        return res.status(400).json({
-          ok: false,
-          err
-        });
-      }
-
+    try {
+      let categoryDB: any = await categoryModel.findByIdAndUpdate(id, body, { new: true, runValidators: true,  context : 'query'  });
       res.json({
         ok: true,
         message: `Category ${categoryDB.name} successfully updated`,
         category: categoryDB
       });
-      
-    });
+
+    } catch (err) {
+
+      return res.status(400).json({
+        
+        ok: false,
+        err
+      });
+    }
+    
   }
 
-  public deleteCategory(req: Request, res: Response) {
+  public async deleteCategory(req: Request, res: Response) {
   
     const id: string = req.params.id;
 
-    let vody = { state: false };
-
-    categoryModel.findOne({ '_id': id }, (err, categoryDB) => {
+    try {
+      let categoryDB= await categoryModel.findOne({ '_id': id });
       
-      if (err) {
-        return res.status(500).json({
-          ok: false,
-          err
-        });
-      }
-
       if (!categoryDB) {
         return res.status(400).json({
           ok: false,
           message: 'There is no active category with this id'
         })
-      }
+      };
 
       categoryDB.state = false;
 
@@ -143,9 +143,23 @@ class CategoryController {
           message: 'Category successfully deleted'
         });
         
-      })
+      });
+      
+    } catch (err) {
+      return res.status(500).json({
+        ok: false,
+        err
+      });
+    }
 
-    });
+
+      
+      
+
+      
+
+     
+
   }
 }
 

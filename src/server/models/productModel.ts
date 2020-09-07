@@ -2,14 +2,14 @@ import mongoose, { Schema, model } from 'mongoose';
 import uniquevalidator from 'mongoose-unique-validator';
 
 export interface Product extends mongoose.Document{
-  name: String,
-  description: String,
+  name: string,
+  description: string,
   img: string,
   category: Schema.Types.ObjectId,
   provider: Schema.Types.ObjectId,
   purchasePrice: Number,
-  unitPrice: Number,
-  wholesalePrice: Number,
+  unitPrice: number,
+  wholesalePrice: number,
   iva: number,
   user:Schema.Types.ObjectId,
   creationDate: Date,
