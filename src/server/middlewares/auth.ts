@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
-
 import { Request, Response, NextFunction } from 'express';
 import env from "../config/env";
+import userModel  from './../models/userModel';
+import { any } from 'underscore';
 
 class Auth {
   
@@ -9,6 +10,7 @@ class Auth {
   //Verificar Token
   //=============================
   public verifyToken(req: any, res: Response, next: NextFunction) {
+
     const token =  <string>req.get('Authorization');
 
     jwt.verify(token, env.SEED, (err, decode: any) => {
@@ -42,6 +44,7 @@ class Auth {
     }
     next();
   }
+
 
 }
 

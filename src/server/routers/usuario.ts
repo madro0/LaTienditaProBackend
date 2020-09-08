@@ -15,7 +15,7 @@ class UserRouter{
 
   config(): void{
     this.router.get('/:id',auth.verifyToken,auth.verifyRole, userController.getUser);
-    this.router.get('',auth.verifyToken,auth.verifyRole, userController.getAllUsers);
+    this.router.get('',auth.verifyToken,auth.verifyRole,userController.getAllUsers);
     this.router.post('',validations.userAddValidation(), auth.verifyToken,auth.verifyRole, userController.addUser);
     this.router.put('/:id',validations.userUpdateValidation(),auth.verifyToken,auth.verifyRole, userController.updateUser);
     this.router.delete('/:id',auth.verifyToken,auth.verifyRole, userController.deleteUser);

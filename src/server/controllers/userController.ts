@@ -1,9 +1,9 @@
 import { check, validationResult } from 'express-validator';
 import { Request, Response } from "express";
 import userModel from "../models/userModel";
-import bcrypt, { hashSync } from "bcrypt";
+import { hashSync } from "bcrypt";
 import _ from "underscore";
-import { User } from "../models/userModel";
+import crypto from 'crypto';
 
 class UserController {
   public async getUser(req: Request, res: Response) {
@@ -75,12 +75,17 @@ class UserController {
   public async addUser(req: Request, res: Response) {
     
     let body = req.body;
+
+    let hasConfirmEmail = crypto.randomBytes(10).toString('hex');
+    console.log(hasConfirmEmail);
     
     let usua = new userModel({
       name: body.name,
       email: body.email,
       password:  body.password = hashSync(body.password, 10),
       role: body.role,
+      //hashConfirmEmail: hashSync(hasConfirmEmail, 2);
+      hashConfirmEmail: hasConfirmEmail
     });
 
     try {
@@ -156,15 +161,17 @@ class UserController {
       });
     }
   }
-  public Test(req: Request, res: Response) {
-    const id: String = req.params.id;
+  public getHashConfirmEmail(id:string){
+    let user = userModel.findById(id,(err, userDB:any)=>{
+      if(err){
+        return null;
+      }
 
-    res.json({
-      ok: true,
-      id,
-      message: "Todo esta bien",
-    });
+      return userDB.hashConfirmEmail;
+    })
   }
+
+
 }
 
 export const userController = new UserController();

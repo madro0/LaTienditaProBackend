@@ -9,7 +9,10 @@ export interface User extends mongoose.Document {
   img: string,
   role: string,
   state: boolean,
-  google: boolean
+  google: boolean,
+  activate:boolean,
+  hashConfirmEmail: string,
+
 };
 
 let rolesValidos = {
@@ -48,6 +51,14 @@ const UserSchema = new Schema({
   google: {
     type: Boolean,
     default: false
+  },
+  active:{
+    type: Boolean,
+    default: false,
+  },
+  hashConfirmEmail: {
+    type: String,
+    required: false
   }
 
 });
@@ -56,6 +67,7 @@ UserSchema.methods.toJSON = function () {
   let user = this;
   let userObject = user.toObject();
   delete userObject.password;
+  delete userObject.hashConfirmEmail;
 
   return userObject;
 }

@@ -1,6 +1,5 @@
 import {Request, Response} from 'express';
 import productModel from '../models/productModel';
-import bcrypt from 'bcrypt';
 import _ from 'underscore';
 
 

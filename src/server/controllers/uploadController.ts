@@ -101,10 +101,8 @@ class UploadController {
         let pathImg = path.join(__dirname, pathString);
         
         if(!fs.existsSync(pathImg)){
-            
             pathImg= path.join(__dirname,`../uploads/no-image-found.jpg` );
             res.sendFile(pathImg);
-        
         }
     
         res.sendFile(pathImg);

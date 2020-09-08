@@ -11,7 +11,7 @@ class LoginController {
     let body = req.body;
     
     try {
-      let userDB = await userModel.findOne({ email: body.email });
+      let userDB:any = await userModel.findOne({ email: body.email });
 
       if (!userDB) {
 
@@ -30,6 +30,16 @@ class LoginController {
             err: {
                 message: 'Wrong email or (password)'
             }
+        });
+      }
+
+      if(!userDB.active){
+        return res.status(400).json({
+          ok: false,
+          err:{
+            message: 'Confirme email',
+            email: userDB.email
+          }
         });
       }
 

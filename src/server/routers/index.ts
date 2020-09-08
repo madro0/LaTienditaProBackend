@@ -6,6 +6,8 @@ import providerRoutes  from './provider';
 import productRoutes  from './product';
 import searchRoutes from './search';
 import uploadRoutes from "./upload";
+import verificationRoutes from "./verification";
+import { auth } from '../middlewares/auth';
 
 
 
@@ -45,6 +47,10 @@ router.use('/search', searchRoutes);
 //Upload router
 //=================================
 router.use('/upload', uploadRoutes);
+//=================================
+//Verify Email
+//=================================
+router.use('/verification', verificationRoutes);
 
 
 export default router;
