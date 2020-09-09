@@ -4,6 +4,7 @@ import userModel from "../models/userModel";
 import { hashSync } from "bcrypt";
 import _ from "underscore";
 import crypto from 'crypto';
+import {sendEmails} from "../helpers/sentEmails";
 
 class UserController {
   public async getUser(req: Request, res: Response) {
@@ -90,6 +91,8 @@ class UserController {
 
     try {
        let userDb = await usua.save();
+
+       const e = await sendEmails.sendConfirmEmail();
 
        res.json({
         ok: true,
