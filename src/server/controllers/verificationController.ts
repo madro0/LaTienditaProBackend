@@ -96,8 +96,9 @@ class VerificationController {
         }
       });
     }
-
   }
+
+ 
 }
 
 export const verificationController = new VerificationController();

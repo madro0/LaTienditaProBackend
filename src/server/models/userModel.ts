@@ -12,6 +12,7 @@ export interface User extends mongoose.Document {
   google: boolean,
   activate:boolean,
   hashConfirmEmail: string,
+  hash: string,
 
 };
 
@@ -59,6 +60,10 @@ const UserSchema = new Schema({
   hashConfirmEmail: {
     type: String,
     required: false
+  },
+  restorePassword:{
+    type:String,
+    required:false,
   }
 
 });

@@ -14,8 +14,9 @@ const userAddValidation = () => {
     body('name').not().isEmpty(),
     body('password').not().isEmpty(),
     // password must be at least 5 chars long
-    body('password').isLength({ min: 6 }),
-
+    body('password').isLength({ min: 6 })
+      .withMessage('La contraseña debe tener como minimo 6 caracteres.'),
+    
     getErros
     
   ]
@@ -30,8 +31,25 @@ const userUpdateValidation = () => {
    
    getErros
    
- ]
+  ]
 } 
+//=================================================
+//providers body validations
+//=================================================
+const userUpdatePasswordValidation = () => {
+    
+    return  [
+      body('password').not().isEmpty(),
+      body('confirmPassword').not().isEmpty(),
+      body('password').equals(body('confirmPassword').toString()).not()
+        .withMessage('La nueva contraseña y la contraseña de confirmacion no coinciden.'),
+      // password must be at least 5 chars long
+      body('password').isLength({ min: 6 })
+        .withMessage('La contraseña debe tener como minimo 6 caracteres.'),
+
+      getErros
+    ]
+  }
 //=================================================
 //Login body validations
 //=================================================
@@ -44,6 +62,29 @@ const LoginValidation = () => {
    getErros
  ]
 } 
+//=================================================
+//resotre body validations
+//=================================================
+const verifyRestorePasswordValidation = () => {
+  return  [
+   //email be an email
+   body('email').isEmail(),
+
+   getErros
+ ]
+} 
+const restorePasswordValidation = ()=>{
+  return [
+    body('password').not().isEmpty(),
+    body('confirmPassword').not().isEmpty(),
+    body('password').equals(body('confirmPassword').toString()).not()
+      .withMessage('La nueva contraseña y la contraseña de confirmacion no coinciden.'),
+    // password must be at least 5 chars long
+    body('password').isLength({ min: 6 })
+      .withMessage('La contraseña debe tener como minimo 6 caracteres.'),
+  ]
+}
+
 //=================================================
 //Category body validations
 //=================================================
@@ -96,5 +137,8 @@ module.exports = {
   userUpdateValidation,
   LoginValidation,
   categoryAddValidation,
-  categoryUpdateValidation
+  categoryUpdateValidation,
+  userUpdatePasswordValidation,
+  verifyRestorePasswordValidation,
+  restorePasswordValidation
 }

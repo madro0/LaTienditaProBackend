@@ -1,69 +1,100 @@
 import nodemailer from 'nodemailer';
 import path from "path";
+import env from "../config/env";
+
 var hbs = require('nodemailer-handlebars');
 
 
 
 class SendEmails {
 
-  public async sendConfirmEmail() {
-    
+  public configEmailServer ={
+    host: env.HOST_SEND_EMAILS,
+    port: env.PORT_SEND_EMAILS,
+    secure:false,
+    auth:{
+      user: env.USER_SEND_EMAILS,
+      pass: env.PASS_SEND_EMAILS,
+    }
+  };
+  public templatesConfig = {
+    viewEngine: {
+
+      layoutsDir: path.resolve(__dirname,'../templates/'),
+      partialsDir: path.resolve(__dirname,'../templates/'),
+      extName: '.hbs',
+      defaultLayout: '',
+    },
+    viewPath: path.resolve(__dirname,'../templates/'),
+    extName: '.hbs',
+  }
+
+  constructor(){}
+
+  public async sendConfirmEmail(urlJSON:any) {
 
     try {
-      let transporter =await nodemailer.createTransport({
-        host: "smtp.sendgrid.net",
-        port: 25,
-        secure:false,
-        auth:{
-          user: 'apikey',
-          pass:'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',
-        } 
-      });
-      
-      
-     
-      transporter.use('compile', hbs({
-        viewEngine: {
-          
-          layoutsDir: path.join(__dirname,'/templates/'),
-          partialsDir: path.join(__dirname,'/templates/'),
-          extName: '.hbs',
-          defaultLayout: '',
-        },
-        viewPath: path.join(__dirname,'/templates/'),
-        extName: '.hbs',
-      }));
-  
+      let transporter =await  nodemailer.createTransport(
+        this.configEmailServer
+      );
+
+      transporter.use('compile', hbs(
+        this.templatesConfig
+      ));
+
+      const url = `http://${urlJSON.host}/api/verification/confirm/${urlJSON.email}/${urlJSON.hash}`
       let mailOptions= {
-        from: '"La Tiendita 🏪" <madro1025@gmail.com>', // sender address
-        to: "daanii2013@gmail.com", // list of receivers
+        from: env.FROM_SEND_MAILS,
+        to: urlJSON.email, // list of receivers
         subject: "Confirm Email", // Subject line
-        text: "Para confirmar su email click aqui",
-        // html: "<b>Hello world?</b>", // html body
+        // text: "Para confirmar su email click aqui",
+        //  html: "<b>Hello world?</b>", // html body
         template: 'confirmEmail',
         context:{
-          url:'http://localhost3000/confirm/daanii2013@gmail.com/123A435B8CEF'
+           url
         }
-        
       };
 
-       transporter.sendMail(mailOptions,(err:any, data:any)=>{
-         if(err){
-           console.log(err);
-           return false;
-         }
-         console.log('send!!');
-         return true;
-       });
-
+      await transporter.sendMail(mailOptions);
+      return true;
+      
     } catch (err) {
       console.log(err);
       return false;
     }
-    
 
+  }
+  public async sendRestorePasswordEmail(token:any, email:string, host:string){
 
+    try {
+      let transporter =await  nodemailer.createTransport(
+        this.configEmailServer
+      );
 
+      transporter.use('compile', hbs(
+        this.templatesConfig
+      ));
+
+      const url = `http://${host}/api/login/restore/${token}`
+      let mailOptions= {
+        from: env.FROM_SEND_MAILS,
+        to: email, // list of receivers
+        subject: "Restablecer contraseña", // Subject line
+        // text: "Para confirmar su email click aqui",
+        //  html: "<b>Hello world?</b>", // html body
+        template: 'restorePass',
+        context:{
+           url
+        }
+      };
+
+      await transporter.sendMail(mailOptions);
+      return true;
+      
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
   }
 }
 export const sendEmails = new SendEmails();

@@ -1,10 +1,12 @@
-import { check, validationResult } from 'express-validator';
 import { Request, Response } from "express";
 import userModel from "../models/userModel";
 import { hashSync } from "bcrypt";
-import _ from "underscore";
+import _, { has } from "underscore";
 import crypto from 'crypto';
 import {sendEmails} from "../helpers/sentEmails";
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import env from '../config/env';
 
 class UserController {
   public async getUser(req: Request, res: Response) {
@@ -78,9 +80,8 @@ class UserController {
     let body = req.body;
 
     let hasConfirmEmail = crypto.randomBytes(10).toString('hex');
-    console.log(hasConfirmEmail);
     
-    let usua = new userModel({
+    let user = new userModel({
       name: body.name,
       email: body.email,
       password:  body.password = hashSync(body.password, 10),
@@ -90,9 +91,27 @@ class UserController {
     });
 
     try {
-       let userDb = await usua.save();
+      let userDb = await user.save();
 
-       const e = await sendEmails.sendConfirmEmail();
+      const urlJSON= {
+        host: req.headers.host,
+        email:userDb.email,
+        hash:hasConfirmEmail
+      }
+
+      let a = sendEmails.sendConfirmEmail(urlJSON);
+      //let a = await sendEmails.sendConfirmEmail(urlJSON);
+        
+      //  if(!a){
+         
+
+      //    return res.status(500).json({
+      //     ok: false,
+      //     err:{
+      //       message: 'Error usuario creado pero mensaje de validacion de email no enviado'
+      //     }
+      //   });
+      //  }
 
        res.json({
         ok: true,
@@ -105,11 +124,7 @@ class UserController {
         ok: false,
         err,
       });
-    }
-   
-      
-    
-
+    } 
   }
 
   public async updateUser(req: Request, res: Response) {
@@ -164,15 +179,134 @@ class UserController {
       });
     }
   }
-  public getHashConfirmEmail(id:string){
-    let user = userModel.findById(id,(err, userDB:any)=>{
-      if(err){
-        return null;
-      }
+  
+  public async updatePassword(req:any, res:Response){
+    const body= req.body;
+    const userLog= req.user;
+    
+    try {
 
-      return userDB.hashConfirmEmail;
-    })
+      let userDB:any = await userModel.findById(userLog._id);
+
+      userDB.password = hashSync(body.password, 10);
+      let userUpdated = await userDB.save();
+      
+      if (!bcrypt.compareSync(body.password, userDB.password)) {
+        return res.status(400).json({
+          ok: false,
+          err: {
+            message: 'Error contraseña incorrecta'
+          }
+        });
+      }
+      res.json({
+        ok:true,
+        message:'contraseña actualizada correctamente',
+        userUpdated
+      });
+
+    } catch (err) {
+      return res.status(500).json({
+        ok: false,
+        err,
+      });
+    }
   }
+
+  public async forgetPassword(req:any, res:Response){
+    let body = req.body;
+    let host = req.headers.host;
+    try {
+      let userDB:any = await userModel.findOne({email:body.email});
+      if(!userDB){
+        res.status(400).json({
+          ok:false,
+          err:{
+            message: 'Usuario no existente en la base de datos.'
+          }
+        });
+      };
+
+      let hash:string =await crypto.randomBytes(10).toString('hex');
+      
+      let token = jwt.sign({
+        hash,
+        email: body.email
+      },env.SEED,{
+        expiresIn: env.CADUCIDAD_TOKEN_RESTORE_PASS
+      });
+
+      userDB.restorePassword = hash;
+
+      await userDB.save();
+
+      sendEmails.sendRestorePasswordEmail(token, body.email, host);
+
+      res.json({
+        ok:true,
+        message:'Mensaje para restaurar contraseña enviado correctamente',
+      });
+
+    } catch (err) {
+      return res.status(500).json({
+        ok: false,
+        err,
+      });
+    }
+  }
+
+  public async restorePassword(req:any, res:Response){
+    
+    
+    if(!req.JSONRestorePassword){
+      return res.status(500).json({
+        ok: false,
+        err:{
+          message:'Error token para restaurar contraseña invalido.'
+        }
+      });
+    }
+    
+    let JSONRestorePassword = req.JSONRestorePassword;
+    let body = req.body;
+    
+    try {
+      
+      let userDB:any = await userModel.findOne({email:JSONRestorePassword.email, restorePassword: JSONRestorePassword.hash});
+
+      
+      if(!userDB){
+        return res.status(400).json({
+          ok: false,
+          err:{
+            message:'Usuario no identificado.'
+          }
+        });
+      }
+     
+      
+      
+      userDB.password = hashSync(body.password, 10);
+      userDB.restorePassword= undefined;
+      let userUpdated = await userDB.save();
+      
+      res.json({
+        ok:true,
+        message:'contraseña actualizada correctamente',
+        userUpdated
+      });
+      
+    } catch (err) {
+      console.log(err);
+      
+      return res.status(500).json({
+        ok: false,
+        err,
+      });
+    }
+
+  }
+  
 
 
 }

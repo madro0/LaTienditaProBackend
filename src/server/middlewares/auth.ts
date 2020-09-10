@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, response } from 'express';
 import env from "../config/env";
 import userModel  from './../models/userModel';
 import { any } from 'underscore';
@@ -43,6 +43,54 @@ class Auth {
       });
     }
     next();
+  }
+
+  //=============================
+  //Verificar Token para la restauracion de contraseña
+  //=============================
+  public verifyTokenRestorePassword(req:any, res:Response){
+    let token = req.params.token;
+
+    jwt.verify(token, env.SEED, (err:any)=>{
+      if(err){
+        return res.status(401).json({
+          ok:false,
+          err: {
+            message: 'Autorization (token) invalid'
+          }
+        });
+      }
+      res.json({
+        ok:true,
+        message:'Token valido'
+      });
+
+    });
+
+  }
+  
+  public decodeTokenRestorePassword(req:any, res:Response, next:NextFunction){
+    let token = req.params.token;
+
+    jwt.verify(token, env.SEED, (err:any, decoder:any)=>{
+      if(err){
+        return res.status(401).json({
+          err: {
+            message: 'Autorization (token) invalid'
+          }
+        });
+      }
+
+      let JSONRestorePassword={
+        hash: decoder.hash,
+        email: decoder.email
+      }
+      
+      req.JSONRestorePassword = JSONRestorePassword;
+      
+      next();
+
+    });
   }
 
 
